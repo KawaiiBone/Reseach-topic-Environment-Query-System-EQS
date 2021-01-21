@@ -42,14 +42,62 @@ void Plugin::Initialize(IBaseInterface* pInterface, PluginInfo& info)
 						new BehaviorConditional(HasInventoryChanged),
 						new BehaviorAction(ManageInventory),
 					}),
+					new BehaviorSequence({
+						new BehaviorConditional(IsInPurgeZone),
+						new BehaviorAction(RunOutOfPurgeZone),
+					}),
+					/*new BehaviorSequence(
+					{
+						new BehaviorConditional(IsInventoryFull),
+						 new BehaviorSelector({
+							 new BehaviorSequence({
+									new BehaviorConditional(AreItemsInGrabRange),
+									new BehaviorAction(GrabAndAddItems),
+								}),
+							 new BehaviorSequence({
+							new BehaviorConditional(AreItemsInSight),
+							new BehaviorAction(SeekClosestItem),
+							}),
+						
+							 }),
+					}),*/
 				new BehaviorSequence({
 						new BehaviorConditional(AreItemsInGrabRange),
 						new BehaviorAction(GrabAndAddItems),
 					}),
 				new BehaviorSequence({
+						new BehaviorConditional(AreItemsInSight),
+						new BehaviorAction(SeekClosestItem),
+								}),
+				new BehaviorSequence(
+					{
+						new BehaviorConditional(AreEnemiesSight),
+						 new BehaviorSelector({
+							 new BehaviorSequence({
+									new BehaviorConditional(HaveGunAndAmmo),
+									new BehaviorAction(AimAtZombie),
+								}),
+							 new BehaviorSequence({
+							new BehaviorConditional(TooManyEnemiesInSight),
+							new BehaviorAction(ChangeToFlee),
+							}),
+						new BehaviorAction(ChangeToEvade)
+							 }),
+					}),
+		/*		new BehaviorSequence({
 						new BehaviorConditional(HasMedKit),
 						new BehaviorConditional(IsHealthLow),
 						new BehaviorAction(Heal),
+					}),*/
+								new BehaviorSequence({
+						new BehaviorConditional(IsHealthLow),
+						 new BehaviorSelector({
+							 new BehaviorSequence({
+									new BehaviorConditional(HasMedKit),
+									new BehaviorAction(Heal),
+								}),
+						new BehaviorAction(GoToMedkit)
+						 }),
 					}),
 				new BehaviorSequence({
 						new BehaviorConditional(IsEnergyLow),
@@ -61,16 +109,9 @@ void Plugin::Initialize(IBaseInterface* pInterface, PluginInfo& info)
 						new BehaviorAction(GoToFood)
 						 }),
 					}),
-				new BehaviorSequence(
-					{
-						new BehaviorConditional(AreEnemiesSight),
-						 new BehaviorSelector({
-							 new BehaviorSequence({
-									new BehaviorConditional(HaveGunAndAmmo),
-									new BehaviorAction(AimAtZombie),
-								}),
-						new BehaviorAction(ChangeToEvade)
-							 }),
+			new BehaviorSequence({
+						new BehaviorConditional(HaveGunAndAmmo),
+						new BehaviorAction(GoToGun),
 					}),
 				new BehaviorSequence({
 						new BehaviorConditional(TookDMG),
@@ -96,8 +137,13 @@ void Plugin::Initialize(IBaseInterface* pInterface, PluginInfo& info)
 								}),
 							 /*new BehaviorAction(SeekClosestItem),*/
 						 new BehaviorAction(GoToUnsearchedHouse)
-							  }),
-							 }),
+					  }),
+				 }),
+			/*			new BehaviorSequence(
+							{
+								new BehaviorConditional(AreItemsInSight),
+								new BehaviorAction(SeekClosestItem)
+							}),*/
 							new BehaviorSequence(
 							{
 								new BehaviorConditional(IsInExploreArea),
@@ -189,7 +235,14 @@ void Plugin::Update(float dt)
 //This function calculates the new SteeringOutput, called once per frame
 SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 {
-
+	if (m_IsScared)
+	{
+		m_ScaredTimer += dt;
+	}
+	else
+	{
+		m_ScaredTimer = 0;
+	}
 	m_pAgentInfo = &m_pInterface->Agent_GetInfo();
 	auto steering = SteeringPlugin_Output();
 	//std::cout << m_pAgentInfo->Position.x << "\n";
@@ -220,6 +273,7 @@ SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 			PurgeZoneInfo zoneInfo;
 			m_pInterface->PurgeZone_GetInfo(e, zoneInfo);
 			std::cout << "Purge Zone in FOV:" << e.Location.x << ", " << e.Location.y << " ---EntityHash: " << e.EntityHash << "---Radius: " << zoneInfo.Radius << std::endl;
+			m_vecPurgeZones.push_back(zoneInfo);
 		}
 	}
 
@@ -287,7 +341,6 @@ SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 	}
 
 
-
 	//steering.RunMode = m_CanRun; //If RunMode is True > MaxLinSpd is increased for a limited time (till your stamina runs out)
 	steering.RunMode = *m_pCanRun;
 	//SteeringPlugin_Output is works the exact same way a SteeringBehaviour output
@@ -298,6 +351,7 @@ SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 	m_RemoveItem = false;
 	m_EnemiesFOVLocation.clear();
 	m_ItemsFOV.clear();
+	m_vecPurgeZones.clear();
 	return steering;
 }
 
@@ -389,13 +443,15 @@ Blackboard* Plugin::CreateBlackboard()
 	std::unordered_map<std::string, int> inventory{ {"Pistol",0}, {"Medkit",0}, {"Food",0} };
 	Elite::Blackboard* pBlackboard = new Elite::Blackboard();
 	std::vector<std::pair<ItemInfo, bool>> unwantedVecItems{};
+	PurgeZoneInfo purgeZone;
 	//pBlackboard->AddData("Agent", m_pAgentInfo);
 	pBlackboard->AddData("Target", &m_Target);
 	pBlackboard->AddData("pTarget", &m_pTarget);
 	pBlackboard->AddData("pExploreTarget", &m_pExploreLocation);
 	pBlackboard->AddData("isClockWise", m_IsClockWise);
 	pBlackboard->AddData("isInExplorerMode", false);
-	pBlackboard->AddData("isScared", false);
+	pBlackboard->AddData("isScared", &m_IsScared);
+	pBlackboard->AddData("scaredTimer", &m_ScaredTimer);
 	pBlackboard->AddData("canRun", &m_pCanRun);
 	//	pBlackboard->AddData("SteeringSetter", &m_SteeringSetter);
 	pBlackboard->AddData("SteeringBehavior", &m_pSteeringBehavior);
@@ -412,6 +468,8 @@ Blackboard* Plugin::CreateBlackboard()
 	pBlackboard->AddData("IsAiming", &m_IsAiming);//m_DifferenceAngluarVel
 	pBlackboard->AddData("differenceAngluarVel", &m_DifferenceAngluarVel);//
 	pBlackboard->AddData("prevFrameHp", m_pInterface->Agent_GetInfo().Health);//
+	pBlackboard->AddData("purgeZones", m_vecPurgeZones);//
+	pBlackboard->AddData("purgeZoneItIsIn", purgeZone);//
 	return pBlackboard;
 }
 

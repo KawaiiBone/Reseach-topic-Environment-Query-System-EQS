@@ -57,7 +57,9 @@ private:
 	Vector2* m_pExploreLocation = new Vector2(1, 1);
 	bool m_IsAiming{ false };
 	float m_DifferenceAngluarVel{0.f};
-	
+	float m_ScaredTimer{0.f};
+	bool m_IsScared{false};
+	std::vector<PurgeZoneInfo> m_vecPurgeZones;
 
 
 	//the int is to see how much value the location has

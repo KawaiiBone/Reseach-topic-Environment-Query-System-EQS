@@ -58,6 +58,8 @@ private:
 	bool m_IsAiming{ false };
 	float m_DifferenceAngluarVel{0.f};
 	float m_ScaredTimer{0.f};
+	float m_StuckTimer{ 0.f };
+	bool m_IsSTuck{ false };
 	bool m_IsScared{false};
 	std::vector<PurgeZoneInfo> m_vecPurgeZones;
 

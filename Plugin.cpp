@@ -43,24 +43,13 @@ void Plugin::Initialize(IBaseInterface* pInterface, PluginInfo& info)
 						new BehaviorAction(ManageInventory),
 					}),
 					new BehaviorSequence({
+						new BehaviorConditional(IsStuck),
+						new BehaviorAction(GetOutOfBeingStuck),
+					}),
+					new BehaviorSequence({
 						new BehaviorConditional(IsInPurgeZone),
 						new BehaviorAction(RunOutOfPurgeZone),
 					}),
-					/*new BehaviorSequence(
-					{
-						new BehaviorConditional(IsInventoryFull),
-						 new BehaviorSelector({
-							 new BehaviorSequence({
-									new BehaviorConditional(AreItemsInGrabRange),
-									new BehaviorAction(GrabAndAddItems),
-								}),
-							 new BehaviorSequence({
-							new BehaviorConditional(AreItemsInSight),
-							new BehaviorAction(SeekClosestItem),
-							}),
-						
-							 }),
-					}),*/
 				new BehaviorSequence({
 						new BehaviorConditional(AreItemsInGrabRange),
 						new BehaviorAction(GrabAndAddItems),
@@ -83,16 +72,11 @@ void Plugin::Initialize(IBaseInterface* pInterface, PluginInfo& info)
 							}),
 						new BehaviorAction(ChangeToEvade)
 							 }),
-					}),
-		/*		new BehaviorSequence({
-						new BehaviorConditional(HasMedKit),
-						new BehaviorConditional(IsHealthLow),
-						new BehaviorAction(Heal),
-					}),*/
-								new BehaviorSequence({
-						new BehaviorConditional(IsHealthLow),
-						 new BehaviorSelector({
-							 new BehaviorSequence({
+						}),
+						new BehaviorSequence({
+							new BehaviorConditional(IsHealthLow),
+							new BehaviorSelector({
+								 new BehaviorSequence({
 									new BehaviorConditional(HasMedKit),
 									new BehaviorAction(Heal),
 								}),
@@ -110,7 +94,7 @@ void Plugin::Initialize(IBaseInterface* pInterface, PluginInfo& info)
 						 }),
 					}),
 			new BehaviorSequence({
-						new BehaviorConditional(HaveGunAndAmmo),
+						new BehaviorConditional(InNeedOfGun),
 						new BehaviorAction(GoToGun),
 					}),
 				new BehaviorSequence({
@@ -243,6 +227,16 @@ SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 	{
 		m_ScaredTimer = 0;
 	}
+
+	if (m_IsSTuck)
+	{
+		m_StuckTimer += dt;
+	}
+	else
+	{
+		m_IsSTuck = 0;
+	}
+
 	m_pAgentInfo = &m_pInterface->Agent_GetInfo();
 	auto steering = SteeringPlugin_Output();
 	//std::cout << m_pAgentInfo->Position.x << "\n";
@@ -443,7 +437,8 @@ Blackboard* Plugin::CreateBlackboard()
 	std::unordered_map<std::string, int> inventory{ {"Pistol",0}, {"Medkit",0}, {"Food",0} };
 	Elite::Blackboard* pBlackboard = new Elite::Blackboard();
 	std::vector<std::pair<ItemInfo, bool>> unwantedVecItems{};
-	PurgeZoneInfo purgeZone;
+	PurgeZoneInfo purgeZone{};
+	Vector2 stuckPoint{0,0};
 	//pBlackboard->AddData("Agent", m_pAgentInfo);
 	pBlackboard->AddData("Target", &m_Target);
 	pBlackboard->AddData("pTarget", &m_pTarget);
@@ -468,8 +463,12 @@ Blackboard* Plugin::CreateBlackboard()
 	pBlackboard->AddData("IsAiming", &m_IsAiming);//m_DifferenceAngluarVel
 	pBlackboard->AddData("differenceAngluarVel", &m_DifferenceAngluarVel);//
 	pBlackboard->AddData("prevFrameHp", m_pInterface->Agent_GetInfo().Health);//
-	pBlackboard->AddData("purgeZones", m_vecPurgeZones);//
+	pBlackboard->AddData("purgeZones", &m_vecPurgeZones);//
 	pBlackboard->AddData("purgeZoneItIsIn", purgeZone);//
+	pBlackboard->AddData("IsStuck", &m_IsSTuck);//
+	pBlackboard->AddData("StuckCounter", &m_StuckTimer);//
+	pBlackboard->AddData("stuckPos", stuckPoint);//
+	pBlackboard->AddData("isGettingOut", false);//
 	return pBlackboard;
 }
 
@@ -484,8 +483,9 @@ void Plugin::FirstExploreLocation()
 	float randomAnge{ float(randomInt(360)) };
 	int randomIntt{ randomInt(2) };
 	randomAnge = ToRadians(randomAnge);
+	const float lessSpace{ 20.f };
 	//int randomIntY{ randomInt(2) };
-	Vector2 length{ m_pInterface->World_GetInfo().Dimensions / 2 };
+	Vector2 length{ (m_pInterface->World_GetInfo().Dimensions.x / 2)- lessSpace,(m_pInterface->World_GetInfo().Dimensions.y / 2) - lessSpace };
 	////	std::cout << randomIntX << "\n";
 	//	//std::cout << randomIntY << "\n"
 

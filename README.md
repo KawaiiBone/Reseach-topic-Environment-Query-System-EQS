@@ -12,5 +12,5 @@ go to the nearest place where you can obtain that.
 
 ## Implementation of EQS in the zombie game
 
-In the zombie game, it collects information about the buildings and items. 
-It knows which building it has been to and which items it left behind for later use.
+In the zombie game, it collects information about the buildings and items via a field of view.
+ It knows which building it has been to and which items it left behind for later use.

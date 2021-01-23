@@ -178,41 +178,41 @@ void Plugin::Update(float dt)
 {
 	//Demo Event Code
 	//In the end your AI should be able to walk around without external input
-	if (m_pInterface->Input_IsMouseButtonUp(Elite::InputMouseButton::eLeft))
-	{
-		//Update target based on input
-		Elite::MouseData mouseData = m_pInterface->Input_GetMouseData(Elite::InputType::eMouseButton, Elite::InputMouseButton::eLeft);
-		const Elite::Vector2 pos = Elite::Vector2(static_cast<float>(mouseData.X), static_cast<float>(mouseData.Y));
-		m_Target = m_pInterface->Debug_ConvertScreenToWorld(pos);
-	}
-	else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_Space))
-	{
-		m_CanRun = true;
-	}
-	else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_Left))
-	{
-		m_AngSpeed -= Elite::ToRadians(10);
-	}
-	else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_Right))
-	{
-		m_AngSpeed += Elite::ToRadians(10);
-	}
-	else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_G))
-	{
-		m_GrabItem = true;
-	}
-	else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_U))
-	{
-		m_UseItem = true;
-	}
-	else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_R))
-	{
-		m_RemoveItem = true;
-	}
-	else if (m_pInterface->Input_IsKeyboardKeyUp(Elite::eScancode_Space))
-	{
-		m_CanRun = false;
-	}
+	//if (m_pInterface->Input_IsMouseButtonUp(Elite::InputMouseButton::eLeft))
+	//{
+	//	//Update target based on input
+	//	Elite::MouseData mouseData = m_pInterface->Input_GetMouseData(Elite::InputType::eMouseButton, Elite::InputMouseButton::eLeft);
+	//	const Elite::Vector2 pos = Elite::Vector2(static_cast<float>(mouseData.X), static_cast<float>(mouseData.Y));
+	//	m_Target = m_pInterface->Debug_ConvertScreenToWorld(pos);
+	//}
+	//else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_Space))
+	//{
+	//	m_CanRun = true;
+	//}
+	//else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_Left))
+	//{
+	//	m_AngSpeed -= Elite::ToRadians(10);
+	//}
+	//else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_Right))
+	//{
+	//	m_AngSpeed += Elite::ToRadians(10);
+	//}
+	//else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_G))
+	//{
+	//	m_GrabItem = true;
+	//}
+	//else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_U))
+	//{
+	//	m_UseItem = true;
+	//}
+	//else if (m_pInterface->Input_IsKeyboardKeyDown(Elite::eScancode_R))
+	//{
+	//	m_RemoveItem = true;
+	//}
+	//else if (m_pInterface->Input_IsKeyboardKeyUp(Elite::eScancode_Space))
+	//{
+	//	m_CanRun = false;
+	//}
 }
 
 //Update
@@ -237,12 +237,12 @@ SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 		m_IsSTuck = 0;
 	}
 
-	m_pAgentInfo = &m_pInterface->Agent_GetInfo();
+	//m_pAgentInfo = &m_pInterface->Agent_GetInfo();
 	auto steering = SteeringPlugin_Output();
 	//std::cout << m_pAgentInfo->Position.x << "\n";
 	//Use the Interface (IAssignmentInterface) to 'interface' with the AI_Framework
 
-	auto nextTargetPos = m_Target; //To start you can use the mouse position as guidance
+	//auto nextTargetPos = m_Target; //To start you can use the mouse position as guidance
 
 	//auto vHousesInFOV = GetHousesInFOV();//uses m_pInterface->Fov_GetHouseByIndex(...)
 	auto vEntitiesInFOV = GetEntitiesInFOV(); //uses m_pInterface->Fov_GetEntityByIndex(...)
@@ -275,45 +275,41 @@ SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 	//INVENTORY USAGE DEMO
 	//********************
 
-	if (m_GrabItem)
-	{
-		ItemInfo item;
-		//Item_Grab > When DebugParams.AutoGrabClosestItem is TRUE, the Item_Grab function returns the closest item in range
-		//Keep in mind that DebugParams are only used for debugging purposes, by default this flag is FALSE
-		//Otherwise, use GetEntitiesInFOV() to retrieve a vector of all entities in the FOV (EntityInfo)
-		//Item_Grab gives you the ItemInfo back, based on the passed EntityHash (retrieved by GetEntitiesInFOV)
-		if (m_pInterface->Item_Grab({}, item))
-		{
-			//Once grabbed, you can add it to a specific inventory slot
-			//Slot must be empty
-			m_pInterface->Inventory_AddItem(0, item);
-		}
-	}
+	//if (m_GrabItem)
+	//{
+	//	ItemInfo item;
+	//	//Item_Grab > When DebugParams.AutoGrabClosestItem is TRUE, the Item_Grab function returns the closest item in range
+	//	//Keep in mind that DebugParams are only used for debugging purposes, by default this flag is FALSE
+	//	//Otherwise, use GetEntitiesInFOV() to retrieve a vector of all entities in the FOV (EntityInfo)
+	//	//Item_Grab gives you the ItemInfo back, based on the passed EntityHash (retrieved by GetEntitiesInFOV)
+	//	if (m_pInterface->Item_Grab({}, item))
+	//	{
+	//		//Once grabbed, you can add it to a specific inventory slot
+	//		//Slot must be empty
+	//		m_pInterface->Inventory_AddItem(0, item);
+	//	}
+	//}
 
-	if (m_UseItem)
-	{
-		//Use an item (make sure there is an item at the given inventory slot)
-		m_pInterface->Inventory_UseItem(0);
-	}
+	//if (m_UseItem)
+	//{
+	//	//Use an item (make sure there is an item at the given inventory slot)
+	//	m_pInterface->Inventory_UseItem(0);
+	//}
 
-	if (m_RemoveItem)
-	{
-		//Remove an item from a inventory slot
-		m_pInterface->Inventory_RemoveItem(0);
-	}
+	//if (m_RemoveItem)
+	//{
+	//	//Remove an item from a inventory slot
+	//	m_pInterface->Inventory_RemoveItem(0);
+	//}
 
 
 
 
 	m_DecisionMaking->Update(dt);
-	//SetSteering(m_pSteeringBehavior);
-	//m_pSteeringBehavior = m_SteeringSetter.steering;
-	//std::cout << "im in pain help" << "\n";
 
 
 
-	m_pSteeringBehavior->SetTarget(nextTargetPos);
-	//std::cout << "mpTarget " << m_pTarget->x << "\n";
+	//m_pSteeringBehavior->SetTarget(nextTargetPos);
 	m_pSteeringBehavior->SetTarget(*m_pTarget);
 	steering.LinearVelocity = m_pSteeringBehavior->CalculateSteering(dt, &m_pInterface->Agent_GetInfo()).LinearVelocity;
 
@@ -340,9 +336,9 @@ SteeringPlugin_Output Plugin::UpdateSteering(float dt)
 	//SteeringPlugin_Output is works the exact same way a SteeringBehaviour output
 
 	//@End (Demo Purposes)
-	m_GrabItem = false; //Reset State
-	m_UseItem = false;
-	m_RemoveItem = false;
+	//m_GrabItem = false; //Reset State
+	//m_UseItem = false;
+	//m_RemoveItem = false;
 	m_EnemiesFOVLocation.clear();
 	m_ItemsFOV.clear();
 	m_vecPurgeZones.clear();

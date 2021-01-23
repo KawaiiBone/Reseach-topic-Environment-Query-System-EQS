@@ -71,12 +71,12 @@ SteeringOutput Flee::CalculateSteering(float deltaT, AgentInfo* pAgent)
 {
 	auto distanceToTarget = Distance(pAgent->Position, m_Target.Position);
 
-	if (distanceToTarget > m_FleeRadius)
-	{
-		SteeringOutput steering{};
-		steering.IsValid = false;
-		return steering;
-	}
+	//if (distanceToTarget > m_FleeRadius)
+	//{
+	//	SteeringOutput steering{};
+	//	steering.IsValid = false;
+	//	return steering;
+	//}
 
 
 	SteeringOutput steering = { Seek::CalculateSteering(deltaT, pAgent) };

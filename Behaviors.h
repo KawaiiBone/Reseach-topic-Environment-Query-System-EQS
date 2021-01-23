@@ -145,7 +145,7 @@ BehaviorState RunOutOfPurgeZone(Elite::Blackboard* pBlackboard)
 
 	AgentInfo agent = pInterface->Agent_GetInfo();
 
-	
+
 
 	float degrees{ atan2(purgeZone.Center.y, purgeZone.Center.x) };
 
@@ -180,35 +180,48 @@ BehaviorState GoToGun(Elite::Blackboard* pBlackboard)
 	//std::min_element(unwantedVecItems.begin(), unwantedVecItems.end());
 	auto agentInf = pInterface->Agent_GetInfo();
 
-	auto tmp = std::min_element(unwantedVecItems.begin(), unwantedVecItems.end(), [&agentInf](std::pair<ItemInfo, bool>& a, std::pair<ItemInfo, bool>& b) {
 
-		if (a.first.Type == eItemType::PISTOL && b.first.Type == eItemType::PISTOL)
-		{
-			if ((agentInf.Position.Distance(a.first.Location)) <= (agentInf.Position.Distance(b.first.Location)))
-			{
-				a.second = true;
-				return true;
-			}
-			return false;
-			//return (agentInf.Position.Distance(a.first.Location)) <= (agentInf.Position.Distance(b.first.Location));
+	std::vector<std::pair<Vector2, int>> tmpMedVec{};
 
-		}
-		else if (a.first.Type == eItemType::PISTOL)
-		{
-			a.second = true;
-			return true;
-		}
 
-		; });
 
-	if (tmp != unwantedVecItems.end())
+	for (size_t i = 0; i < unwantedVecItems.size(); i++)
 	{
-		std::cout << "GO TO GUn!!\n";
-		(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmp->first.Location);
+		if (unwantedVecItems[i].first.Type == eItemType::MEDKIT)
+		{
+			tmpMedVec.push_back({ unwantedVecItems[i].first.Location, i });
+		}
+	}
+
+
+
+	if (tmpMedVec.size() == 0)
+	{
+		return Failure;
+	}
+	else if (tmpMedVec.size() == 1)
+	{
+		unwantedVecItems[tmpMedVec.front().second].second = true;
+		std::cout << "GO TO Gun!!\n";
+		(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmpMedVec.front().first);
+		pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
 		return Success;
 	}
 
-	return Failure;
+
+	std::pair<Vector2, int> tmp = *std::min_element(tmpMedVec.begin(), tmpMedVec.end(), [&agentInf](std::pair<Vector2, int>& a, std::pair<Vector2, int>& b)
+		{
+
+			return (agentInf.Position.Distance(a.first) <= agentInf.Position.Distance(b.first));
+
+		});
+
+	unwantedVecItems[tmp.second].second = true;
+
+	std::cout << "GO TO Gun!!\n";
+	(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmp.first);
+	pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
+	return Success;
 }
 BehaviorState GoToMedkit(Elite::Blackboard* pBlackboard)
 {
@@ -226,35 +239,48 @@ BehaviorState GoToMedkit(Elite::Blackboard* pBlackboard)
 	//std::min_element(unwantedVecItems.begin(), unwantedVecItems.end());
 	auto agentInf = pInterface->Agent_GetInfo();
 
-	auto tmp = std::min_element(unwantedVecItems.begin(), unwantedVecItems.end(), [&agentInf](std::pair<ItemInfo, bool>& a, std::pair<ItemInfo, bool>& b) {
+	std::vector<std::pair<Vector2, int>> tmpMedVec{};
 
-		if (a.first.Type == eItemType::MEDKIT && b.first.Type == eItemType::MEDKIT)
-		{
-			if ((agentInf.Position.Distance(a.first.Location)) <= (agentInf.Position.Distance(b.first.Location)))
-			{
-				a.second = true;
-				return true;
-			}
-			return false;
-			//return (agentInf.Position.Distance(a.first.Location)) <= (agentInf.Position.Distance(b.first.Location));
 
-		}
-		else if (a.first.Type == eItemType::MEDKIT)
-		{
-			a.second = true;
-			return true;
-		}
 
-		; });
-
-	if (tmp != unwantedVecItems.end())
+	for (size_t i = 0; i < unwantedVecItems.size(); i++)
 	{
+		if (unwantedVecItems[i].first.Type == eItemType::MEDKIT)
+		{
+			tmpMedVec.push_back({ unwantedVecItems[i].first.Location, i });
+		}
+	}
+
+
+
+	if (tmpMedVec.size() == 0)
+	{
+		return Failure;
+	}
+	else if (tmpMedVec.size() == 1)
+	{
+		unwantedVecItems[tmpMedVec.front().second].second = true;
 		std::cout << "GO TO MEDKIT!!\n";
-		(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmp->first.Location);
+		(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmpMedVec.front().first);
+		pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
 		return Success;
 	}
 
-	return Failure;
+
+	std::pair<Vector2, int> tmp = *std::min_element(tmpMedVec.begin(), tmpMedVec.end(), [&agentInf](std::pair<Vector2, int>& a, std::pair<Vector2, int>& b)
+		{
+
+			return (agentInf.Position.Distance(a.first) <= agentInf.Position.Distance(b.first));
+
+		});
+
+	unwantedVecItems[tmp.second].second = true;
+
+	std::cout << "GO TO MEDKIT!!\n";
+	(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmp.first);
+	pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
+	return Success;
+
 }
 BehaviorState GoToFood(Elite::Blackboard* pBlackboard)
 {
@@ -274,41 +300,54 @@ BehaviorState GoToFood(Elite::Blackboard* pBlackboard)
 
 	//std::min_element(unwantedVecItems.begin(), unwantedVecItems.end());
 	auto agentInf = pInterface->Agent_GetInfo();
-	
-	auto tmp = std::min_element(unwantedVecItems.begin(), unwantedVecItems.end(), [&agentInf]( std::pair<ItemInfo, bool>& a,  std::pair<ItemInfo, bool>& b) {
 
-		if (a.first.Type == eItemType::FOOD && b.first.Type == eItemType::FOOD)
-		{
-			if ((agentInf.Position.Distance(a.first.Location)) <= (agentInf.Position.Distance(b.first.Location)))
-			{
-				a.second = true;
-				return true;
-			}
-			return false;
-			//return (agentInf.Position.Distance(a.first.Location)) <= (agentInf.Position.Distance(b.first.Location));
 
-		}
-		else if(a.first.Type == eItemType::FOOD)
-		{
-			a.second = true;
-			return true;
-		}
+	std::vector<std::pair<Vector2, int>> tmpMedVec{};
 
-			; });
 
-	if (tmp != unwantedVecItems.end())
+
+	for (size_t i = 0; i < unwantedVecItems.size(); i++)
 	{
+		if (unwantedVecItems[i].first.Type == eItemType::FOOD)
+		{
+			tmpMedVec.push_back({ unwantedVecItems[i].first.Location, i });
+		}
+	}
+
+
+
+	if (tmpMedVec.size() == 0)
+	{
+		return Failure;
+	}
+	else if (tmpMedVec.size() == 1)
+	{
+		unwantedVecItems[tmpMedVec.front().second].second = true;
 		std::cout << "GO TO Food!!\n";
-		(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmp->first.Location);
+		(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmpMedVec.front().first);
+		pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
 		return Success;
 	}
 
-	return Failure;
+
+	std::pair<Vector2, int> tmp = *std::min_element(tmpMedVec.begin(), tmpMedVec.end(), [&agentInf](std::pair<Vector2, int>& a, std::pair<Vector2, int>& b)
+		{
+
+			return (agentInf.Position.Distance(a.first) <= agentInf.Position.Distance(b.first));
+
+		});
+
+	unwantedVecItems[tmp.second].second = true;
+
+	std::cout << "GO TO Food!!\n";
+	(**pTarget) = pInterface->NavMesh_GetClosestPathPoint(tmp.first);
+	pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
+	return Success;
 }
 
 bool TookDMG(Elite::Blackboard* pBlackboard)
 {
-	float prevFrameHp{0.f};
+	float prevFrameHp{ 0.f };
 	IExamInterface* pInterface = nullptr;
 	bool* isScared{ false };
 	bool** canRun = nullptr;
@@ -479,7 +518,7 @@ bool InNeedOfGun(Elite::Blackboard* pBlackboard)
 	{
 		if (a.first.Type == eItemType::PISTOL)
 		{
-			
+
 			return inventory["Pistol"] < 1;
 		}
 	}
@@ -558,6 +597,7 @@ bool IsRoomEmpty(Elite::Blackboard* pBlackboard)
 //items
 bool IsInExploreArea(Elite::Blackboard* pBlackboard)
 {
+	const float maxRange{ 160.f };
 	const float radius{ 10.f };
 	IExamInterface* pInterface = nullptr;
 	Elite::Vector2** exploreTarget = nullptr;
@@ -567,6 +607,11 @@ bool IsInExploreArea(Elite::Blackboard* pBlackboard)
 	AgentInfo agent = pInterface->Agent_GetInfo();
 	pBlackboard->GetData("isScared", isScared);
 
+
+	if (agent.Position.Distance({0, 0}) > maxRange)
+	{
+		return true;
+	}
 
 	*isScared = false;
 	return agent.Position.Distance(**exploreTarget) <= radius;
@@ -589,21 +634,24 @@ bool AreItemsInSight(Elite::Blackboard* pBlackboard)
 
 
 	pVecFOVEItems->erase(std::remove_if(pVecFOVEItems->begin(), pVecFOVEItems->end(), [unwantedVecItems](auto b) {
-		
+
 		for (std::pair<ItemInfo, bool> a : unwantedVecItems)
 		{
 			if (!a.second)
 			{
 				return b.Location == a.first.Location;
 			}
-			
+
 		}
-		
-		
+
+
 		; }), pVecFOVEItems->end());
 
+
+
+
 	pBlackboard->ChangeData("VectorFOVItems", pVecFOVEItems);
-	
+
 
 
 
@@ -626,6 +674,7 @@ bool AreItemsInGrabRange(Elite::Blackboard* pBlackboard)
 	{
 		if (agent.GrabRange >= agent.Position.Distance(a.Location))
 		{
+			
 			return true;
 		}
 	}
@@ -727,7 +776,7 @@ BehaviorState ChangeExploreLocation(Elite::Blackboard* pBlackboard)
 		return Failure;
 	}
 
-	
+
 
 	if (isClockWise)
 	{
@@ -742,7 +791,7 @@ BehaviorState ChangeExploreLocation(Elite::Blackboard* pBlackboard)
 			{
 				(*exploreTarget)->y = -length;
 			}
-			
+
 		}
 		else if ((*exploreTarget)->x < 0)
 		{
@@ -767,9 +816,9 @@ BehaviorState ChangeExploreLocation(Elite::Blackboard* pBlackboard)
 			{
 				(*exploreTarget)->x = -length;
 			}
-	
+
 		}
-		else if((*exploreTarget)->y < 0)
+		else if ((*exploreTarget)->y < 0)
 		{
 			(*exploreTarget)->y = length;
 		}
@@ -868,7 +917,7 @@ BehaviorState ChangeToFlee(Elite::Blackboard* pBlackboard)
 	pBlackboard->GetData("pTarget", pTarget);
 	IExamInterface* pInterface = nullptr;
 	pBlackboard->GetData("pInterface", pInterface);
-	
+
 
 
 	auto agentInf = pInterface->Agent_GetInfo();
@@ -879,7 +928,7 @@ BehaviorState ChangeToFlee(Elite::Blackboard* pBlackboard)
 	}
 
 
-	
+
 
 	auto tmp = std::min_element(pVecFOVEnemiesHash->begin(), pVecFOVEnemiesHash->end(), [&agentInf](const Vector2& a, const Vector2& b) {
 
@@ -949,7 +998,7 @@ BehaviorState ChangeToEvade(Elite::Blackboard* pBlackboard)
 
 
 
-	
+
 	//** pTarget = ((pInterface->Agent_GetInfo().Position) + (**exploreTarget)) - **pTarget;
 	//**pTarget = ((pInterface->Agent_GetInfo().Position) + (**exploreTarget)/2) - **pTarget;
 	**pTarget = ((pInterface->Agent_GetInfo().Position) + (**exploreTarget) * 0.5f) - **pTarget;
@@ -1045,12 +1094,13 @@ BehaviorState GrabAndAddItems(Elite::Blackboard* pBlackboard)
 	auto agentInf = pInterface->Agent_GetInfo();
 
 	std::cout << "GrabAndADDItems!!\n";
-	for (EntityInfo a :*pVecFOVEItems)
+	for (EntityInfo a : *pVecFOVEItems)
 	{
 		ItemInfo tmpInfo{};
 
 		if (pInterface->Item_Grab(a, tmpInfo))
 		{
+			
 			for (const std::pair<ItemInfo, bool>& ib : unwantedVecItems)
 			{
 				if (!ib.second && ib.first.Location == tmpInfo.Location)
@@ -1058,13 +1108,12 @@ BehaviorState GrabAndAddItems(Elite::Blackboard* pBlackboard)
 					return Success;
 				}
 			}
-
 			ItemInfo tmpItem{};
 			for (size_t i = 0; i < pInterface->Inventory_GetCapacity(); i++)
 			{
 				if (!pInterface->Inventory_GetItem(i, tmpItem))
 				{
-
+			
 
 
 					switch (tmpInfo.Type)
@@ -1073,7 +1122,8 @@ BehaviorState GrabAndAddItems(Elite::Blackboard* pBlackboard)
 						if (inventory["Pistol"] >= maxDuplicates)
 						{
 							std::cout << "Tomany Pistal\n";
-							unwantedVecItems.push_back({ tmpItem,false });
+							unwantedVecItems.push_back({ tmpInfo,false });
+							pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
 							return Success;
 						}
 						//inventory["Pistol"]++;
@@ -1083,20 +1133,22 @@ BehaviorState GrabAndAddItems(Elite::Blackboard* pBlackboard)
 						if (inventory["Medkit"] >= maxDuplicates)
 						{
 							std::cout << "Tomany Medkit\n";
-							unwantedVecItems.push_back({ tmpItem,false });
+							unwantedVecItems.push_back({ tmpInfo,false });
+							pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
 							return Success;
 						}
-					//	inventory["Medkit"]++;
-						//inventory["Medkit"]++;
+						//	inventory["Medkit"]++;
+							//inventory["Medkit"]++;
 						break;
 					case eItemType::FOOD:
 						if (inventory["Food"] >= maxDuplicates)
 						{
 							std::cout << "Tomany Food\n";
-							unwantedVecItems.push_back({ tmpItem,false });
+							unwantedVecItems.push_back({ tmpInfo,false });
+							pBlackboard->ChangeData("VectorUnwantedItems", unwantedVecItems);
 							return Success;
 						}
-					//inventory["Food"]++;
+						//inventory["Food"]++;
 						break;
 					case eItemType::GARBAGE:
 						pInterface->Item_Destroy(a);
@@ -1126,7 +1178,7 @@ BehaviorState GrabAndAddItems(Elite::Blackboard* pBlackboard)
 		}
 	}
 
-	
+
 
 
 
@@ -1233,7 +1285,7 @@ BehaviorState ManageInventory(Elite::Blackboard* pBlackboard)
 			case eItemType::PISTOL:
 				if (pInterface->Weapon_GetAmmo(tmpItem) < 1)
 				{
-				//	inventory["Pistol"]--;
+					//	inventory["Pistol"]--;
 					pInterface->Inventory_RemoveItem(i);
 				}
 				else
@@ -1380,7 +1432,7 @@ BehaviorState AimAtZombie(Elite::Blackboard* pBlackboard)
 	auto offset = ToRadians(90.05001f);
 	//float degrees{ atan2(target.x, target.y) };
 
-	if (agent.Orientation < degrees + offset && agent.Orientation > degrees- offset || agent.Position.Distance(target) < agent.GrabRange)
+	if (agent.Orientation < degrees + offset && agent.Orientation > degrees - offset || agent.Position.Distance(target) < agent.GrabRange)
 	{
 		std::cout << "SHOOOTING!!\n";
 		*pIsAiming = false;
@@ -1399,7 +1451,7 @@ BehaviorState AimAtZombie(Elite::Blackboard* pBlackboard)
 	}
 	std::cout << "AimingAtZOmbie!!\n";
 	*pIsAiming = true;
-	
+
 	return Success;
 }
 
@@ -1461,14 +1513,14 @@ bool IsInventoryFull(Elite::Blackboard* pBlackboard)
 	int counter{ 0 };
 
 
-	for (std::pair<std::string, int> a: inventory)
+	for (std::pair<std::string, int> a : inventory)
 	{
 		for (int i = 0; i < a.second; i++)
 		{
 			counter++;
 
 		}
-		
+
 	}
 
 	return  counter == pInterface->Inventory_GetCapacity();
@@ -1482,14 +1534,14 @@ bool IsInPurgeZone(Elite::Blackboard* pBlackboard)
 	pBlackboard->GetData("pInterface", pInterface);
 	AgentInfo agent = pInterface->Agent_GetInfo();
 
-	for (PurgeZoneInfo a: *VecPurgZone)
+	for (PurgeZoneInfo a : *VecPurgZone)
 	{
 		if (sqrt((a.Center.x - agent.Position.x) * (a.Center.x - agent.Position.x) + (a.Center.y - agent.Position.y) * (a.Center.y - agent.Position.y)) <= a.Radius)
 		{
 			pBlackboard->ChangeData("purgeZoneItIsIn", a);//
 			return true;
 		}
-	
+
 	}
 
 	return false;

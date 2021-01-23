@@ -12,7 +12,7 @@ To collect information it uses Generators to see which one is the best and retur
 Via Tests it knows which option to do is best. 
 
 
-## Implementation of EQS in the zombie game
+# Implementation of EQS in the zombie game
 
 Quick explanation: 
 In the zombie game, it collects information about the buildings and items via a field of view.
@@ -26,3 +26,4 @@ It leaves any item behind that the ai cannot carry and remembers those who could
 This feature is especially useful in late game. 
 Now it knows all this information and checks if it needs any of those items left behind. 
 
+# Result

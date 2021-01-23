@@ -4,10 +4,12 @@
  
 It is a feature for an ai, to obtain information from its environment. 
 Then collect that information to see via a couple of tests. Which of the information that is collected, 
-is the most needed at the moment in time.  
+is the most needed at the moment in time. The way it knows what actions to do, is asking questions from a Behavior tree.
 
 A good example is to know where you have seen food and then if needed, 
 go to the nearest place where you can obtain that. 
+To collect information it uses Generators to see which one is the best and returns that item to the Behavior tree. 
+Via Tests it knows which option to do is best. 
 
 
 ## Implementation of EQS in the zombie game

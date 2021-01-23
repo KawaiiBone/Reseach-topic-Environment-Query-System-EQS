@@ -26,6 +26,11 @@ It leaves any item behind that the ai cannot carry and remembers those who could
 This feature is especially useful in late game. 
 Now it knows all this information and checks if it needs any of those items left behind. 
 
+
+
+![The ai sees items in a building](/Pictures/ZombiePhotoGettingItems.jpg)
+
+
 # Result
 
 This is a feature that is very useful for late game. 

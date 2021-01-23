@@ -27,3 +27,10 @@ This feature is especially useful in late game.
 Now it knows all this information and checks if it needs any of those items left behind. 
 
 # Result
+
+This is a feature that is very useful for late game. 
+Via its information gained then it can survive longer and better.
+
+
+
+But the down side with this is, is that it requires you to get there at the late stage of the game.

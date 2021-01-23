@@ -28,7 +28,7 @@ Now it knows all this information and checks if it needs any of those items left
 
 
 
-![The ai sees items in a building](/Pictures/ZombiePhotoGettingItems.jpg)
+![The ai sees items in a building](/Pictures/ZombieGettingItems.jpg)
 
 
 # Result

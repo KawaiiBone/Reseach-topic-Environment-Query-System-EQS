@@ -33,4 +33,4 @@ Via its information gained then it can survive longer and better.
 
 
 
-But the down side with this is, is that it requires you to get there at the late stage of the game.
+But the down side with this is, is that it requires you to get there at the late stage of the game. For the feature to be working well.

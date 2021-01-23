@@ -14,11 +14,11 @@ Via Tests it knows which option to do is best.
 
 # Implementation of EQS in the zombie game
 
-Quick explanation: 
+## Quick explanation: 
 In the zombie game, it collects information about the buildings and items via a field of view.
 It knows which building it has been to and which items it left behind for later use.
 
-How it is done in the files: 
+## How it is done in the game: 
 Via its field of view, it looks at buildings, enemies, and items. 
 By looking at the building it knows via location if it has been into this building before. 
 Then it searches the building and picks up the items that it needs.

@@ -33,9 +33,13 @@ Now it knows all this information and checks if it needs any of those items left
 
 # Result
 
+Now that Environment query system is in the zombie game, 
+the ai knows where it left its items behind for later use and go towards them when the time comes when the ai needs it. 
+It will avoid houses that are already searched in. 
+Except when the ai knows something is good in there for it that it has left behind. 
+
+
+
 This is a feature that is very useful for late game. 
 Via its information gained then it can survive longer and better.
-
-
-
 But the down side with this is, is that it requires you to get there at the late stage of the game. For the feature to be working well.

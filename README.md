@@ -30,6 +30,8 @@ This feature is especially useful in late game.
 Now it knows all this information and checks if it needs any of those items left behind. 
 
 
+## How it behaves in the behavior tree:
+while collecting items, it doesn’t collect those who the ai has too many of and when the inventory is full. It remembers the items it has left behind. When its hp or energy is low, isn’t exploring buildings and doesn’t have anything in its inventory to fix the problem. It will go to the nearest location where it has the necessary item it has left behind to collect and use. 
 
 
 

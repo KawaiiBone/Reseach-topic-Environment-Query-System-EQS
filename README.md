@@ -11,6 +11,9 @@ go to the nearest place where you can obtain that.
 To collect information it uses Generators to see which one is the best and returns that item to the Behavior tree. 
 Via Tests it knows which option to do is best. 
 
+![The ai sees items in a building](/Pictures/ZombieGettingItems.jpg)
+
+
 
 # Implementation of EQS in the zombie game
 
@@ -28,7 +31,7 @@ Now it knows all this information and checks if it needs any of those items left
 
 
 
-![The ai sees items in a building](/Pictures/ZombieGettingItems.jpg)
+
 
 
 # Result
@@ -38,7 +41,7 @@ the ai knows where it left its items behind for later use and go towards them wh
 It will avoid houses that are already searched in. 
 Except when the ai knows something is good in there for it that it has left behind. 
 
-
+![The ai sees items in a building and picks the ones it needs](/Pictures/Getting_items.gif)
 
 This is a feature that is very useful for late game. 
 Via its information gained then it can survive longer and better.

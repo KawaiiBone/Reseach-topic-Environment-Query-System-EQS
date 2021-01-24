@@ -25,7 +25,7 @@ It knows which building it has been to and which items it left behind for later 
 Via its field of view, it looks at buildings, enemies, and items. 
 By looking at the building it knows via location if it has been into this building before. 
 Then it searches the building and picks up the items that it needs.
-It leaves any item behind that the ai cannot carry and remembers those who could be useful later in the game.
+It leaves any item behind that the ai cannot carry or has to many of and remembers those who could be useful later in the game.
 This feature is especially useful in late game. 
 Now it knows all this information and checks if it needs any of those items left behind. 
 
